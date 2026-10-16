@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Send our team a message and we’ll get back to you."
+    />
+    <title>Get in touch | Northstar</title>
+    <link rel="stylesheet" href="/static/Style.css" />
+    <script src="/static/app.js" defer></script>
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="contact-card" aria-labelledby="page-title">
+        <div class="intro">
+          <div class="brand-mark" aria-hidden="true">N</div>
+          <p class="eyebrow">LET'S TALK</p>
+          <h1 id="page-title">We’d love to hear from you.</h1>
+          <p class="intro-copy">
+            Have a question or an idea? Send us a note and our team will be in
+            touch.
+          </p>
+          <div class="response-note">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span>We usually reply within one business day</span>
+          </div>
+        </div>
+
+        <form id="enquiry-form" class="enquiry-form">
+          <div class="field">
+            <label for="name">Your name</label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              autocomplete="name"
+              placeholder="e.g. Alex Morgan"
+              maxlength="100"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label for="email">Email address</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              placeholder="alex@example.com"
+              maxlength="100"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label for="message">How can we help?</label>
+            <textarea
+              id="message"
+              name="message"
+              rows="5"
+              placeholder="Tell us a little about what you have in mind..."
+              maxlength="500"
+              required
+            ></textarea>
+            <span class="field-hint">Up to 500 characters</span>
+          </div>
+
+          <button class="submit-button" type="submit">
+            <span>Send your enquiry</span>
+            <span class="button-arrow" aria-hidden="true">↗</span>
+          </button>
+          <p
+            id="form-status"
+            class="form-status"
+            role="status"
+            aria-live="polite"
+          ></p>
+        </form>
+      </section>
+
+      <footer class="page-footer">Thoughtful conversations start here.</footer>
+    </main>
+  </body>
+</html>

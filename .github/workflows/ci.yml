@@ -1,0 +1,36 @@
+name: CI Pipeline
+
+# Trigger when pushing or making a PR to master
+on: 
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  
+jobs: 
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Clone your repo onto the GitHub runner VM
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # Step 2: Install uv
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with: 
+        version: "latest"
+
+    # Step 3: Install Python
+    - name: Set up Python
+      run: uv python install 3.14
+
+    # Step 4: Install dependencies
+    - name: Install dependencies
+      run: uv sync
+
+    # Step 5: Check code syntax & run tests
+    - name: Test Python code compilation
+      run: uv run python -m py_compile src/enquiry_automation/main.py
+    

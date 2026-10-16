@@ -1,0 +1,22 @@
+[project]
+name = "enquiry-automation"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "sam", email = "oyerindesamuel207@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "dotenv>=0.9.9",
+    "fastapi[standard]>=0.143.0",
+    "resend>=2.49.1",
+    "sqlalchemy>=2.1.4",
+]
+
+[project.scripts]
+enquiry-automation = "enquiry_automation:main"
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"
