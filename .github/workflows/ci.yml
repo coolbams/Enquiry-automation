@@ -3,9 +3,9 @@ name: CI Pipeline
 # Trigger when pushing or making a PR to master
 on: 
   push:
-    branches: [master]
+    branches: [ main ]
   pull_request:
-    branches: [master]
+    branches: [ main ]
   
 jobs: 
   test:
