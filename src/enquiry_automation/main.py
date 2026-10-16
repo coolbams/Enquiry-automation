@@ -5,6 +5,8 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
+from datetime import datetime, timedelta, UTC
+
 from .database.connection import Base, engine, get_db
 from .database.models import Enquiry
 
@@ -36,6 +38,7 @@ class EnquiryRequest(BaseModel):
     name: str
     email: str
     message: str
+    website: str | None = None
 
 
 class EnquiryResponse(BaseModel):
@@ -63,6 +66,10 @@ def make_enquiry(enquiry: EnquiryRequest,
                  db: Session = Depends(get_db)):
     """Endpoint to handle new enquiries."""
 
+    if enquiry.website:
+        logger.warning("Bot detected via honeypot from %s", enquiry.email)
+        return {"message": "Enquiry received successfully"}
+
     new_enquiry = Enquiry(
         name=enquiry.name,
         email=enquiry.email,
@@ -72,7 +79,16 @@ def make_enquiry(enquiry: EnquiryRequest,
     db.add(new_enquiry)
     db.commit()
 
-    
-    background_tasks.add_task(send_email_background, enquiry.email)
+    cooldown_limit = datetime.now(UTC) - timedelta(minutes=5)
+    recent_enquiry = db.query(Enquiry).filter(
+        Enquiry.email == enquiry.email,
+        Enquiry.received_at >= cooldown_limit,
+        Enquiry.id != new_enquiry.id
+    ).first()
+
+    if not recent_enquiry:
+        background_tasks.add_task(send_email_background, enquiry.email)
+    else:
+        logger.info("Skipping confirmation email for %s (cooldown active)", enquiry.email)
    
     return {"message": "Enquiry received successfully"}

@@ -245,6 +245,15 @@ h1 {
   text-align: center;
 }
 
+.hp-field{
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+
 @media (max-width: 700px) {
   .page-shell {
     padding: 24px 15px 18px;
