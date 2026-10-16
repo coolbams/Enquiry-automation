@@ -30,7 +30,6 @@ jobs:
     - name: Install dependencies
       run: uv sync
 
-    # Step 5: Check code syntax & run tests
-    - name: Test Python code compilation
-      run: uv run python -m py_compile src/enquiry_automation/main.py
-    
+    # Step 5: Run automated test suite
+    - name: Run test suite with pytest
+      run: uv run pytest
