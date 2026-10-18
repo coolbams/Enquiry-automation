@@ -44,13 +44,13 @@ class EnquiryRequest(BaseModel):
 class EnquiryResponse(BaseModel):
     message: str
 
+
 def send_email_background(email: str):
     """Worker task that runs after response is returned."""
     try:
         send_email(email)
     except Exception:
         logger.exception("Failed to send confirmation email to %s", email)
-
 
 
 
