@@ -1,25 +1,22 @@
+import logging
+import uuid
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, HTTPException, BackgroundTasks
+from fastapi import BackgroundTasks, Depends, FastAPI
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta, UTC
-
-from .database.connection import Base, engine, get_db
-from .database.models import Enquiry
 
 from .apis.resendEmailApi import send_email
-
-import logging
+from .database import crud
+from .database.connection import Base, SessionLocal, engine, get_db
+from .schemas import EnquiryRequest, EnquiryResponse
 
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
 logger = logging.getLogger(__name__)
-
 
 TEMPLATE_DIR = Path(__file__).resolve().parent.parent / "templates"
 
@@ -34,24 +31,28 @@ app = FastAPI(
 app.mount("/static", StaticFiles(directory=TEMPLATE_DIR), name="static")
 
 
-class EnquiryRequest(BaseModel):
-    name: str
-    email: str
-    message: str
-    website: str | None = None
-
-
-class EnquiryResponse(BaseModel):
-    message: str
-
-
-def send_email_background(email: str):
-    """Worker task that runs after response is returned."""
+def send_email_background(enquiry_id: uuid.UUID, email: str):
+    """Worker task that runs after response is returned and records delivery log."""
+    db = SessionLocal()
     try:
         send_email(email)
-    except Exception:
+        crud.create_log(
+            db,
+            enquiry_id=enquiry_id,
+            status="email_sent",
+            sent_confirmation_email=True,
+        )
+    except Exception as exc:
         logger.exception("Failed to send confirmation email to %s", email)
-
+        crud.create_log(
+            db,
+            enquiry_id=enquiry_id,
+            status="email_failed",
+            sent_confirmation_email=False,
+            error_message=str(exc)[:500],
+        )
+    finally:
+        db.close()
 
 
 @app.get("/")
@@ -61,34 +62,27 @@ def read_root():
 
 
 @app.post("/enquiries", response_model=EnquiryResponse)
-def make_enquiry(enquiry: EnquiryRequest, 
-                 background_tasks: BackgroundTasks, 
-                 db: Session = Depends(get_db)):
+def make_enquiry(
+    enquiry: EnquiryRequest,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
     """Endpoint to handle new enquiries."""
-
     if enquiry.website:
         logger.warning("Bot detected via honeypot from %s", enquiry.email)
+        crud.create_log(db, status="bot_blocked", is_human=False)
         return {"message": "Enquiry received successfully"}
 
-    new_enquiry = Enquiry(
-        name=enquiry.name,
-        email=enquiry.email,
-        message=enquiry.message
-    )
+    new_enquiry = crud.create_enquiry(db, enquiry)
 
-    db.add(new_enquiry)
-    db.commit()
-
-    cooldown_limit = datetime.now(UTC) - timedelta(minutes=5)
-    recent_enquiry = db.query(Enquiry).filter(
-        Enquiry.email == enquiry.email,
-        Enquiry.received_at >= cooldown_limit,
-        Enquiry.id != new_enquiry.id
-    ).first()
-
-    if not recent_enquiry:
-        background_tasks.add_task(send_email_background, enquiry.email)
+    if not crud.is_in_cooldown(db, email=enquiry.email, exclude_enquiry_id=new_enquiry.id):
+        background_tasks.add_task(send_email_background, new_enquiry.id, enquiry.email)
     else:
         logger.info("Skipping confirmation email for %s (cooldown active)", enquiry.email)
-   
+        crud.create_log(
+            db,
+            enquiry_id=new_enquiry.id,
+            status="cooldown_skipped",
+        )
+
     return {"message": "Enquiry received successfully"}

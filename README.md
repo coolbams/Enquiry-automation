@@ -45,7 +45,9 @@ enquiry-automation/
 │       │   └── resendEmailApi.py # Resend email delivery integration
 │       ├── database/
 │       │   ├── connection.py    # Database engine and session dependency
-│       │   └── models.py        # SQLAlchemy Enquiry model
+│       │   ├── crud.py          # Database operations and query helpers
+│       │   └── models.py        # SQLAlchemy Enquiry & EnquiryLog models
+│       ├── schemas.py           # Pydantic request & response models
 │       └── main.py              # FastAPI app, endpoints, and background worker
 ├── tests/
 │   ├── conftest.py              # In-memory SQLite fixtures & DB overrides

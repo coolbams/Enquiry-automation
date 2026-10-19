@@ -26,6 +26,12 @@ def setup_database():
     Base.metadata.drop_all(bind=test_engine)
 
 
+@pytest.fixture(autouse=True)
+def override_session_local(monkeypatch):
+    """Patch main.SessionLocal to use the test in-memory engine during tests."""
+    monkeypatch.setattr("enquiry_automation.main.SessionLocal", TestingSessionLocal)
+
+
 @pytest.fixture
 def db_session(setup_database):
     """Provides a fresh database session for a test."""
