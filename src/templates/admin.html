@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>// ENQUIRY_ADMIN</title>
+  <link rel="stylesheet" href="/static/admin.css" />
+  <script src="/static/admin.js" defer></script>
+</head>
+<body>
+  <div class="dashboard-container">
+    
+    <!-- Top Header -->
+    <header class="dashboard-header">
+      <div class="brand-wrapper">
+        <span class="brand-tag">// ENQUIRY_ADMIN</span>
+        <span class="brand-subtitle">telemetry & audit system</span>
+      </div>
+      <div class="header-actions">
+        <span class="live-indicator">
+          <span class="dot"></span> live
+        </span>
+        <button id="refresh-btn" class="btn">[ refresh ]</button>
+        <button id="logout-btn" class="btn">[ logout ]</button>
+      </div>
+    </header>
+
+    <!-- Metrics Bar -->
+    <section class="stats-grid">
+      <div class="stat-card primary">
+        <div class="stat-label">[01] Total Enquiries</div>
+        <div id="stat-total" class="stat-value">0</div>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-label">[02] Delivered Emails</div>
+        <div id="stat-sent" class="stat-value">0</div>
+      </div>
+      <div class="stat-card error">
+        <div class="stat-label">[03] Delivery Failures</div>
+        <div id="stat-failed" class="stat-value">0</div>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-label">[04] Bots Blocked</div>
+        <div id="stat-bots" class="stat-value">0</div>
+      </div>
+    </section>
+
+    <!-- Tabs Navigation -->
+    <nav class="tabs-nav">
+      <button id="tab-enquiries" class="tab-btn active">[ ENQUIRIES ]</button>
+      <button id="tab-bots" class="tab-btn">[ BLOCKED_BOTS ]</button>
+    </nav>
+
+    <!-- Enquiries Panel -->
+    <section id="panel-enquiries" class="panel">
+      <div class="panel-header">
+        <span class="panel-title">// recent_enquiries</span>
+        <span id="enquiries-count" class="brand-subtitle">0 records</span>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Date (UTC)</th>
+            <th>Contact</th>
+            <th>Message</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="enquiries-tbody">
+          <tr>
+            <td colspan="4" class="empty-state">Loading enquiries...</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Blocked Bots Panel -->
+    <section id="panel-bots" class="panel" style="display: none;">
+      <div class="panel-header">
+        <span class="panel-title">// blocked_bot_attempts</span>
+        <span id="bots-count" class="brand-subtitle">0 records</span>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Date (UTC)</th>
+            <th>Status</th>
+            <th>Type</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody id="bots-tbody">
+          <tr>
+            <td colspan="4" class="empty-state">Loading bot logs...</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </div>
+</body>
+</html>

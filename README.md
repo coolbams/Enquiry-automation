@@ -39,7 +39,10 @@ enquiry-automation/
 │   ├── templates/
 │   │   ├── Index.html           # Contact form markup with honeypot
 │   │   ├── Style.css            # Responsive styling
-│   │   └── app.js               # Form submission handling
+│   │   ├── app.js               # Form submission handling
+│   │   ├── admin.html           # Minimalist monospace admin dashboard
+│   │   ├── admin.css            # Monospace dashboard styling (#3F88C5)
+│   │   └── admin.js             # Dashboard dynamic fetching & audit timeline
 │   └── enquiry_automation/
 │       ├── apis/
 │       │   └── resendEmailApi.py # Resend email delivery integration
@@ -51,7 +54,8 @@ enquiry-automation/
 │       └── main.py              # FastAPI app, endpoints, and background worker
 ├── tests/
 │   ├── conftest.py              # In-memory SQLite fixtures & DB overrides
-│   └── test_enquiries.py        # Automated test cases
+│   ├── test_admin.py            # Admin authentication and query tests
+│   └── test_enquiries.py        # Enquiry, honeypot & cooldown tests
 ├── pyproject.toml               # Project metadata & dependencies
 ├── uv.lock                      # Locked dependency tree
 └── README.md

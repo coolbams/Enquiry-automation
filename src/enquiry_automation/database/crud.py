@@ -65,3 +65,32 @@ def is_in_cooldown(
         query = query.filter(Enquiry.id != exclude_enquiry_id)
 
     return query.first() is not None
+
+
+def get_enquiries(db: Session, skip: int = 0, limit: int = 50):
+    return(
+        db.query(Enquiry)
+        .order_by(Enquiry.received_at.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+def get_admin_stats( db:Session ) -> dict:
+    """Get high-level counts for the dashboard cards."""
+    return{
+        "total_enquiries": db.query(Enquiry).count(),
+        "emails_sent": db.query(EnquiryLog).filter(EnquiryLog.sent_confirmation_email == True).count(),
+        "emails_failed" : db.query(EnquiryLog).filter(EnquiryLog.status == "email_failed").count(),
+        "bots_blocked" : db.query(EnquiryLog).filter(EnquiryLog.status == "bot_blocked").count(),
+    }
+
+def get_bot_logs(db: Session, skip: int = 0, limit: int = 50) -> list[EnquiryLog]:
+    return(
+        db.query(EnquiryLog)
+        .filter(EnquiryLog.is_human == False)
+        .order_by(EnquiryLog.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )

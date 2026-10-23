@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>// ENQUIRY_ADMIN :: LOGIN</title>
+  <link rel="stylesheet" href="/static/admin.css" />
+  <style>
+    .login-wrapper {
+      min-height: 80vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 400px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 32px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    }
+    .login-header {
+      margin-bottom: 24px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+    .form-group label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .form-control {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: #fbfbfd;
+      color: var(--text-main);
+      outline: none;
+      transition: border-color 140ms ease, background 140ms ease;
+    }
+    .form-control:focus {
+      border-color: var(--primary);
+      background: #ffffff;
+      box-shadow: 0 0 0 2px var(--primary-subtle);
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      background: var(--primary);
+      color: #ffffff;
+      border: 1px solid var(--primary);
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 120ms ease;
+    }
+    .btn-submit:hover {
+      background: var(--primary-hover);
+    }
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+    .error-banner {
+      display: none;
+      background: var(--error-bg);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: var(--error);
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 11px;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="brand-tag">// ENQUIRY_ADMIN</div>
+        <div class="brand-subtitle">administrative gateway authentication</div>
+      </div>
+
+      <div id="error-banner" class="error-banner"></div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label for="username">[ username ]</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            class="form-control"
+            placeholder="e.g. admin"
+            required
+            autocomplete="username"
+            autofocus
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">[ password ]</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="form-control"
+            placeholder="••••••••"
+            required
+            autocomplete="current-password"
+          />
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn-submit">[ authenticate ]</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("login-form");
+    const errorBanner = document.getElementById("error-banner");
+    const submitBtn = document.getElementById("submit-btn");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorBanner.style.display = "none";
+      submitBtn.disabled = true;
+      submitBtn.textContent = "[ authenticating... ]";
+
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+
+      try {
+        const res = await fetch("/api/admin/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.detail || "Authentication failed");
+        }
+
+        // Successfully authenticated, redirect to dashboard
+        window.location.href = "/admin";
+      } catch (err) {
+        errorBanner.textContent = `// ${err.message}`;
+        errorBanner.style.display = "block";
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "[ authenticate ]";
+      }
+    });
+  </script>
+</body>
+</html>
